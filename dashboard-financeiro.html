@@ -76,7 +76,7 @@
         </div>
         <div>
           <h1 class="text-[1.05rem] font-bold leading-tight">Painel Financeiro</h1>
-          <p id="sub" class="text-[.7rem]" style="color:var(--faint)">Iago Anderson · dados reais das faturas</p>
+          <p id="sub" class="text-[.7rem]" style="color:var(--faint)">Iago Anderson · dados reais de 5 faturas</p>
         </div>
       </div>
       <select id="monthSel" class="inp tnum" style="width:auto;min-width:150px;font-weight:600"></select>
@@ -200,12 +200,13 @@ const CAT_COLORS=['--c0','--c1','--c2','--c3','--c4','--c5','--c6','--c7','--c8'
 function catColor(cat){const i=state.categories.indexOf(cat);return css(CAT_COLORS[((i<0?8:i))%9]);}
 
 /* ============ state ============ */
-const STORAGE='painel_financeiro_v1';
+const STORAGE='painel_financeiro_v2';
 let state=null;
 function defaultState(){
   const cards=[
     {id:'itau',  name:'Cartão Itaú (final 3462)',       closingDay:1,  dueDay:8},
     {id:'mp',    name:'Mercado Pago Visa (final 1514)',  closingDay:12, dueDay:19},
+    {id:'fat',   name:'Cartão fatura 15/10 (finais 2349/6829/8944)', closingDay:8, dueDay:15},
   ];
   // compra-mãe (parcelamentos)
   const purchases=[
@@ -215,6 +216,9 @@ function defaultState(){
     {id:'p_agp',  desc:'Mercado Livre — AGP Tecnologia', category:'Outros', method:'crédito', card:'mp', responsible:'Iago', total:5578.86, parcelas:21, firstDate:'2025-10-20', withInterest:false},
     {id:'p_meli12',desc:'Mercado Livre', category:'Outros', method:'crédito', card:'mp', responsible:'Iago', total:3498.96, parcelas:12, firstDate:'2026-07-07', withInterest:false},
     {id:'p_seg',  desc:'Seguro Auto Bradesco (ELO final 5873)', category:'Transporte', method:'crédito', card:null, responsible:'Iago', total:1938.00, parcelas:5, firstDate:'2026-09-05', withInterest:false},
+    {id:'p_distak',desc:'Shopee — Distak Store', category:'Outros', method:'crédito', card:'fat', responsible:'Iago', total:4446.12, parcelas:12, firstDate:'2026-05-27', withInterest:false},
+    {id:'p_pdpet',desc:'Shopee — PDPet', category:'Outros', method:'crédito', card:'fat', responsible:'Iago', total:230.90, parcelas:2, firstDate:'2026-09-29', withInterest:false},
+    {id:'p_hussei',desc:'Shopee — vestuário', category:'Outros', method:'crédito', card:'fat', responsible:'Iago', total:3599.88, parcelas:12, firstDate:'2026-09-22', withInterest:false},
   ];
   // standalone transactions (reais, extraídas dos documentos)
   const standalone=[];
@@ -223,10 +227,23 @@ function defaultState(){
   caixa.forEach(([d,v])=>standalone.push({id:uid(),date:d,desc:'Prestação habitação Caixa (MCMV)',category:'Moradia',type:'saida',value:v,method:'Débito automático',responsible:'Iago'}));
   // Mercado Livre à vista na fatura MP
   standalone.push({id:uid(),date:'2026-09-28',desc:'Mercado Livre',category:'Outros',type:'saida',value:126.16,method:'crédito',responsible:'Iago'});
+  // Fatura 15/10 — compras à vista ("Única") extraídas do CSV
+  const fatura1510=[
+    ['2026-09-10','Economart',121.56,'Outros'],
+    ['2026-09-11','Atacadão 902',794.74,'Alimentação'],
+    ['2026-09-20','Jim.com Pizza Burger',101.00,'Alimentação'],
+    ['2026-09-25','MP Ademário',604.00,'Alimentação'],
+    ['2026-09-25','Atalaia J',561.00,'Alimentação'],
+    ['2026-10-03','Anthropic — Claude (assinatura)',115.48,'Assinaturas'],
+    ['2026-10-03','IOF — Anthropic Claude',4.04,'Outros'],
+    ['2026-10-03','Casa das Esfihas Gourmet',58.00,'Alimentação'],
+  ];
+  fatura1510.forEach(([d,desc,v,cat])=>standalone.push({id:uid(),date:d,desc,category:cat,type:'saida',value:v,method:'crédito',responsible:'Iago'}));
+  // Shopee Geisa (R$ 282,63, 21/09) foi estornada no mesmo dia na fatura → líquido zero, não lançada.
   // RENDA — não constava nos documentos: premissa editável
   for(let m=1;m<=10;m++){standalone.push({id:uid(),date:`2026-${pad(m)}-05`,desc:'RENDA ESTIMADA — ajuste nas configurações',category:'Renda',type:'entrada',value:7000,method:'PIX',responsible:'Iago',estimated:true});}
   return{
-    version:1,
+    version:2,
     categories:['Moradia','Alimentação','Transporte','Saúde','Lazer','Assinaturas','Educação','Investimentos','Outros'],
     methods:['PIX','débito','crédito','boleto','dinheiro','Débito automático'],
     users:['Iago'],
