@@ -200,7 +200,7 @@ const CAT_COLORS=['--c0','--c1','--c2','--c3','--c4','--c5','--c6','--c7','--c8'
 function catColor(cat){const i=state.categories.indexOf(cat);return css(CAT_COLORS[((i<0?8:i))%9]);}
 
 /* ============ state ============ */
-const STORAGE='painel_financeiro_v2';
+const STORAGE='painel_financeiro_v3';
 let state=null;
 function defaultState(){
   const cards=[
@@ -241,14 +241,14 @@ function defaultState(){
   fatura1510.forEach(([d,desc,v,cat])=>standalone.push({id:uid(),date:d,desc,category:cat,type:'saida',value:v,method:'crédito',responsible:'Iago'}));
   // Shopee Geisa (R$ 282,63, 21/09) foi estornada no mesmo dia na fatura → líquido zero, não lançada.
   // RENDA — não constava nos documentos: premissa editável
-  for(let m=1;m<=10;m++){standalone.push({id:uid(),date:`2026-${pad(m)}-05`,desc:'RENDA ESTIMADA — ajuste nas configurações',category:'Renda',type:'entrada',value:7000,method:'PIX',responsible:'Iago',estimated:true});}
+  for(let m=1;m<=10;m++){standalone.push({id:uid(),date:`2026-${pad(m)}-05`,desc:'Renda (salário)',category:'Renda',type:'entrada',value:7000,method:'PIX',responsible:'Iago'});}
   return{
-    version:2,
+    version:3,
     categories:['Moradia','Alimentação','Transporte','Saúde','Lazer','Assinaturas','Educação','Investimentos','Outros'],
     methods:['PIX','débito','crédito','boleto','dinheiro','Débito automático'],
     users:['Iago'],
     cards, purchases, standalone,
-    settings:{emergencyMonths:6, essential:['Moradia','Alimentação','Saúde','Transporte','Educação'], currentReserve:0, incomeEstimated:true},
+    settings:{emergencyMonths:6, essential:['Moradia','Alimentação','Saúde','Transporte','Educação'], currentReserve:0, incomeEstimated:false},
   };
 }
 function load(){
